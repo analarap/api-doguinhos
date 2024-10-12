@@ -57,3 +57,26 @@ pip install Flask Flask-RESTful Flask-PyMongo Flask-Marshmallow marshmallow-sqla
 ```bash
 python app.py
 ```
+
+## Uso
+
+### 1. Criar doguinhos
+```bash
+POST: http://localhost:5000/dogs
+```
+
+### 2. Atualizar doguinhos 
+```bash
+PUT: http://localhost:5000/dogs/<id-do-doguinho>
+```
+
+### 3. Listar todos os doguinhos ou algum doguinho específico 
+```bash
+ALL GET: http://localhost:5000/dogs/
+GET BY ID: http://localhost:5000/dogs/<id-do-doguinho>
+```
+
+### 4. Remover doguinhos :(
+```bash
+DELETE: http://localhost:5000/dogs/<id-do-doguinho>
+```
