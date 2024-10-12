@@ -12,7 +12,7 @@ class DogResource(Resource):
     def get(self, name=None):
         if name:
             return get_dog_by_name(name)
-        return get_all_dogs()
+        return DogService.get_all_dogs()
 
     def post(self):
         parser = reqparse.RequestParser()
@@ -22,27 +22,32 @@ class DogResource(Resource):
         parser.add_argument('available_for_adoption', type=bool, required=True)
         args = parser.parse_args()
 
-        return create_dog(args['name'], args['breed'], args['age'], args['available_for_adoption'])
+        return DogService.create_dog(args['name'], args['breed'], args['age'], args['available_for_adoption'])
 
 class DogDetails(Resource):
     def get(self, id):
-        dog = DogService.get_dog_by_name(name)
+        dog = DogService.get_dog_by_id(id)
         if dog is None:
-            return make_response(jsonify("Doguinho não encontrado."), 400)
+            return make_response(jsonify("Dog not found."), 400)
         dogschema = dog_schema.DogSchema()
         return make_response(dogschema.jsonify(dog), 200)
     
-    def put(self, name):
-        parser = reqparse.RequestParser()
-        parser.add_argument('breed', required=False)
-        parser.add_argument('age', type=int, required=False)
-        parser.add_argument('available_for_adoption', type=bool, required=False)
-        args = parser.parse_args()
+    def put(self, id):
+        dog_bd = DogService.get_dog_by_id(id)
+        if dog_bd is None:
+            return make_response(jsonify("Dog not found."), 404) # NOT FOUND
+        dogschema = dog_schema.DogSchema()
+        validate = dogschema.validate(request.json)
+        if validate:
+            return make_response(jsonify(validate), 400)
+        else:
+            json_data = request.get_json()
+            new_dog = dog_model.Dog(**json_data)
+            update_dog = DogService.update_dog(new_dog, id)
+            return make_response(dogschema.jsonify(update_dog), 200)
 
-        return update_dog(name, args['breed'], args['age'], args['available_for_adoption'])
-
-    def delete(self, name):
-        return delete_dog(name)
+    def delete(self, id):
+        return DogService.delete_dog(id)
     
     
 api.add_resource(DogResource, '/dogs')
